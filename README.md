@@ -15,3 +15,4 @@ hope to provide CSS22Resolver and CSS3Resolver.
 
 
 This was first developed for use in [Pandas](pandas.pydata.org) ([#15530](https://github.com/pandas-dev/pandas/pull/15530)).
+Issues will continue to be prioritised to improve CSS support there, in the absence of other clear use-cases.
