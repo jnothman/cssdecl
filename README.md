@@ -2,6 +2,7 @@
 
 This package provides basic computation of CSS declarations in order to:
 
+* handle overwriting of properties
 * expand shorthands like `border-width: 0 5px` into `border-top-width: 0`, `border-right-width: 5px`, `border-bottom-width: 0`, `border-left-width: 5px`
 * (TODO!) expand shorthands like `font: 5px sans-serif bold` into `font-family: sans-serif`, `font-size: 5px`, `font-weight: bold`
 * resolve sizes to a common unit (i.e. pt)
