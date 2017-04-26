@@ -10,9 +10,9 @@ DOCLINES = (__doc__ or '').split("\n")
 # Some boilerplate related to versioning taken from numpy
 
 MAJOR = 0
-MINOR = 0
+MINOR = 1
 MICRO = 0
-ISRELEASED = True
+ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
