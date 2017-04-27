@@ -63,7 +63,8 @@ def setup_package():
 
     try:
         # See setup.cfg
-        setup(setup_requires=['pytest-runner'],
+        setup(py_modules=['cssdecl'],
+              setup_requires=['pytest-runner'],
               tests_require=['pytest>=2.7', 'pytest-cov~=2.4'],
               version=get_version_info()[0])
     finally:
