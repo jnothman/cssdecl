@@ -11,8 +11,8 @@ DOCLINES = (__doc__ or '').split("\n")
 
 MAJOR = 0
 MINOR = 1
-MICRO = 1
-ISRELEASED = True
+MICRO = 2
+ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
