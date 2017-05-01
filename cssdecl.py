@@ -20,7 +20,7 @@ class BaseCSSResolver(object):
         self.initial = initial or {}
 
     def resolve_string(self, declarations_str, inherited=None):
-        """ the given declarations to atomic properties
+        """Resolve the given declarations to atomic properties
 
         Parameters
         ----------
