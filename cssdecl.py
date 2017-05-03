@@ -5,6 +5,8 @@
 import re
 import warnings
 
+import tinycss2
+
 __version__ = '0.1.3+dev'
 
 
@@ -113,6 +115,9 @@ class _BaseCSSResolver(object):
                         conversions=self.MARGIN_RATIOS)
 
         return props
+
+    def resolve_parsed(self, declarations, inherited=None):
+        if inherited is None
 
     UNIT_RATIOS = {
         'rem': ('pt', 12),
