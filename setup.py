@@ -2,7 +2,6 @@
 
 import os
 import sys
-import subprocess
 from setuptools import setup
 
 DOCLINES = (__doc__ or '').split("\n")
