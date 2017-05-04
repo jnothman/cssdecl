@@ -8,12 +8,15 @@ import warnings
 __version__ = '0.1.2+dev'
 
 
+__all__ = ['CSSWarning', 'CSS22Resolver']
+
+
 class CSSWarning(UserWarning):
-    """This CSS syntax cannot currently be parsed"""
+    """Warning for when this CSS syntax cannot currently be parsed"""
     pass
 
 
-class BaseCSSResolver(object):
+class _BaseCSSResolver(object):
     """A callable for parsing and resolving CSS to atomic properties
 
     """
@@ -223,7 +226,7 @@ class BaseCSSResolver(object):
                               'in %r' % decl, CSSWarning)
 
 
-class CommonExpansions(object):
+class _CommonExpansions(object):
     SIDE_SHORTHANDS = {
         1: [0, 0, 0, 0],
         2: [0, 1, 0, 1],
@@ -253,5 +256,5 @@ class CommonExpansions(object):
     expand_padding = _side_expander('padding-%s')
 
 
-class CSS22Resolver(BaseCSSResolver, CommonExpansions):
+class CSS22Resolver(_BaseCSSResolver, _CommonExpansions):
     pass
