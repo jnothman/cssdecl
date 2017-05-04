@@ -5,7 +5,7 @@
 import re
 import warnings
 
-__version__ = '0.1.2+dev'
+__version__ = '0.1.2'
 
 
 __all__ = ['CSSWarning', 'CSS22Resolver']
