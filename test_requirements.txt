@@ -1,0 +1,5 @@
+setuptools
+pip
+flake8
+pytest
+pytest-cov
