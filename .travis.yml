@@ -1,0 +1,21 @@
+language: python
+
+cache:
+  apt: true
+  # We use three different cache directory
+  # to work around a Travis bug with multi-platform cache
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/download
+env:
+  global:
+    # Directory where tests are run from
+    - MODULE=cssdecl
+  matrix:
+    - DISTRIB="conda" PYTHON_VERSION="2.7"
+    - DISTRIB="conda" PYTHON_VERSION="3.4"
+    - DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="true"
+
+install: source ci_scripts/travis/install.sh
+script: bash ci_scripts/travis/test.sh
+after_success: source ci_scripts/travis/success.sh
