@@ -16,7 +16,6 @@ import sys
 import os
 
 import sphinx_rtd_theme
-import cssdecl
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -25,6 +24,8 @@ import cssdecl
 
 # project root
 sys.path.insert(0, os.path.abspath('..'))
+
+import cssdecl  # noqa
 
 # -- General configuration ---------------------------------------------------
 
