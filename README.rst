@@ -1,6 +1,11 @@
 ``cssdecl`` Python CSS declaration computer
 -------------------------------------------
 
+|version| |py-versions|
+
+|build| |docs| |coverage|
+
+
 This package provides basic computation of CSS declarations in order to:
 
 * handle overwriting of properties
@@ -52,3 +57,25 @@ Issues will continue to be prioritised to improve CSS support there, in the abse
 
 
 .. _Pandas: http://pandas.pydata.org
+
+
+.. |py-versions| image:: https://img.shields.io/pypi/pyversions/Django.svg
+    :alt: Python versions supported
+
+.. |version| image:: https://badge.fury.io/py/cssdecl.svg
+    :alt: Latest version on PyPi
+    :target: https://badge.fury.io/py/cssdecl
+
+.. |build| image:: https://travis-ci.org/jnothman/cssdecl.svg?branch=master
+    :alt: Travis CI build status
+    :scale: 100%
+    :target: https://travis-ci.org/jnothman/cssdecl
+
+.. |coverage| image:: https://coveralls.io/repos/github/jnothman/cssdecl/badge.svg
+    :alt: Test coverage
+    :target: https://coveralls.io/github/jnothman/cssdecl
+
+.. |docs| image:: https://readthedocs.org/projects/cssdecl/badge/?version=latest
+     :alt: Documentation Status
+     :scale: 100%
+     :target: https://cssdecl.readthedocs.io/en/latest/?badge=latest
