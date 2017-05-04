@@ -17,4 +17,4 @@ script:
   - python setup.py test
   - flake8
 after_success:
-  - coveralls
+  - codecov
