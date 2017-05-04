@@ -48,7 +48,7 @@ This package provides basic computation of CSS declarations in order to:
 
 Some properties that are not shorthands in CSS 2.2 become
 shorthands in CSS 3, such as `text-decoration`. We therefore
-hope to provide :class:`cssdecl.CSS22Resolver` and :class:`cssdecl.CSS3Resolver`.
+hope to provide ``cssdecl.CSS22Resolver`` and ``cssdecl.CSS3Resolver``.
 
 This module does *not* process CSS selectors (e.g. ``#some-id > * > div.some-class``) and their applicability to elements, including specificity (e.g. ``!important``).
 
