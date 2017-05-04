@@ -17,7 +17,7 @@ class CSSWarning(UserWarning):
 
 
 class _BaseCSSResolver(object):
-    """A callable for parsing and resolving CSS to atomic properties
+    """Base class for parsing and resolving CSS to atomic properties
 
     """
 
@@ -39,7 +39,7 @@ class _BaseCSSResolver(object):
         Returns
         -------
         props : dict
-            Atomic CSS 2.2 properties
+            Atomic CSS 2.2 properties mapped to their values as strings
 
         Examples
         --------
@@ -257,4 +257,5 @@ class _CommonExpansions(object):
 
 
 class CSS22Resolver(_BaseCSSResolver, _CommonExpansions):
-    pass
+    """Parses and resolves CSS to atomic CSS 2.2 properties
+    """
