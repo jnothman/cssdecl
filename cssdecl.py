@@ -5,6 +5,8 @@
 import re
 import warnings
 
+__version__ = '0.1.2+dev'
+
 
 class CSSWarning(UserWarning):
     """This CSS syntax cannot currently be parsed"""
