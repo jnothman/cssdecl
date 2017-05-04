@@ -1,7 +1,7 @@
 ``cssdecl`` Python CSS declaration computer
 -------------------------------------------
 
-|version| |py-versions|
+|version| |licence| |py-versions|
 
 |build| |docs| |coverage|
 
@@ -79,3 +79,6 @@ Issues will continue to be prioritised to improve CSS support there, in the abse
      :alt: Documentation Status
      :scale: 100%
      :target: https://cssdecl.readthedocs.io/en/latest/?badge=latest
+
+.. |licence| image:: https://img.shields.io/badge/Licence-BSD-blue.svg
+     :target: https://opensource.org/licenses/BSD-3-Clause
