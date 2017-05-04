@@ -62,7 +62,7 @@ class _BaseCSSResolver(object):
          ('font-weight', 'bold')]
         """
 
-        props = dict(self.atomize(self.parse(declarations_str)))
+        props = dict(self._atomize(self._parse(declarations_str)))
         if inherited is None:
             inherited = {}
 
@@ -91,7 +91,7 @@ class _BaseCSSResolver(object):
                 em_pt = float(em_pt[:-2])
             else:
                 em_pt = None
-            props['font-size'] = self.size_to_pt(
+            props['font-size'] = self._size_to_pt(
                 props['font-size'], em_pt, conversions=self.FONT_SIZE_RATIOS)
 
             font_size = float(props['font-size'][:-2])
@@ -102,13 +102,13 @@ class _BaseCSSResolver(object):
         for side in self.SIDES:
             prop = 'border-%s-width' % side
             if prop in props:
-                props[prop] = self.size_to_pt(
+                props[prop] = self._size_to_pt(
                     props[prop], em_pt=font_size,
                     conversions=self.BORDER_WIDTH_RATIOS)
             for prop in ['margin-%s' % side, 'padding-%s' % side]:
                 if prop in props:
                     # TODO: support %
-                    props[prop] = self.size_to_pt(
+                    props[prop] = self._size_to_pt(
                         props[prop], em_pt=font_size,
                         conversions=self.MARGIN_RATIOS)
 
@@ -156,10 +156,10 @@ class _BaseCSSResolver(object):
         # Default: medium only if solid
     })
 
-    def size_to_pt(self, in_val, em_pt=None, conversions=UNIT_RATIOS):
+    def _size_to_pt(self, in_val, em_pt=None, conversions=UNIT_RATIOS):
         def _error():
             warnings.warn('Unhandled size: %r' % in_val, CSSWarning)
-            return self.size_to_pt('1!!default', conversions=conversions)
+            return self._size_to_pt('1!!default', conversions=conversions)
 
         try:
             val, unit = re.match(r'^(\S*?)([a-zA-Z%!].*)', in_val).groups()
@@ -196,7 +196,7 @@ class _BaseCSSResolver(object):
             size_fmt = '%f'
         return (size_fmt + 'pt') % val
 
-    def atomize(self, declarations):
+    def _atomize(self, declarations):
         for prop, value in declarations:
             attr = 'expand_' + prop.replace('-', '_')
             try:
@@ -207,7 +207,7 @@ class _BaseCSSResolver(object):
                 for prop, value in expand(prop, value):
                     yield prop, value
 
-    def parse(self, declarations_str):
+    def _parse(self, declarations_str):
         """Generates (prop, value) pairs from declarations
 
         In a future version may generate parsed tokens from tinycss/tinycss2
