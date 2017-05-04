@@ -1,4 +1,5 @@
-# `cssdecl` Python CSS declaration computer
+`cssdecl` Python CSS declaration computer
+-----------------------------------------
 
 This package provides basic computation of CSS declarations in order to:
 
@@ -15,5 +16,8 @@ shorthands in CSS 3, such as `text-decoration`. We therefore
 hope to provide CSS22Resolver and CSS3Resolver.
 
 
-This was first developed for use in [Pandas](pandas.pydata.org) ([#15530](https://github.com/pandas-dev/pandas/pull/15530)).
+This was first developed for use in Pandas_ (`#15530 <https://github.com/pandas-dev/pandas/pull/15530>`_).
 Issues will continue to be prioritised to improve CSS support there, in the absence of other clear use-cases.
+
+
+.. _Pandas: http://pandas.pydata.org
