@@ -71,9 +71,9 @@ Issues will continue to be prioritised to improve CSS support there, in the abse
     :scale: 100%
     :target: https://travis-ci.org/jnothman/cssdecl
 
-.. |coverage| image:: https://coveralls.io/repos/github/jnothman/cssdecl/badge.svg
+.. |coverage| image:: https://img.shields.io/codecov/c/github/jnothman/cssdecl.svg
     :alt: Test coverage
-    :target: https://coveralls.io/github/jnothman/cssdecl
+    :target: https://codecov.io/gh/jnothman/cssdecl
 
 .. |docs| image:: https://readthedocs.org/projects/cssdecl/badge/?version=latest
      :alt: Documentation Status
