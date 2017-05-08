@@ -116,9 +116,6 @@ class _BaseCSSResolver(object):
 
         return props
 
-    def resolve_parsed(self, declarations, inherited=None):
-        if inherited is None
-
     UNIT_RATIOS = {
         'rem': ('pt', 12),
         'ex': ('em', .5),
@@ -212,23 +209,29 @@ class _BaseCSSResolver(object):
                 for prop, value in expand(prop, value):
                     yield prop, value
 
+    def _clean_tokens(self, tokens):
+        cleaned = []
+        for tok in tokens:
+            if tok.type == 'comment' or tok.type == 'whitespace':
+                pass
+            elif tok.type == 'error':
+                # TODO: indicate error context (requires
+                warnings.warn('Error parsing CSS: %r' % tok.message,
+                              CSSWarning)
+            else:
+                cleaned.append(tok)
+        return cleaned
+
     def _parse(self, declarations_str):
         """Generates (prop, value) pairs from declarations
 
         In a future version may generate parsed tokens from tinycss/tinycss2
         """
-        for decl in declarations_str.split(';'):
-            if not decl.strip():
-                continue
-            prop, sep, val = decl.partition(':')
-            prop = prop.strip().lower()
-            # TODO: don't lowercase case sensitive parts of values (strings)
-            val = val.strip().lower()
-            if sep:
-                yield prop, val
-            else:
-                warnings.warn('Ill-formatted attribute: expected a colon '
-                              'in %r' % decl, CSSWarning)
+        decls = tinycss2.parse_declaration_list(declarations_str)
+        decls = self._clean_tokens(decls)
+        for decl in decls:
+            value_str = tinycss2.serialize(decl.value).strip().lower()
+            yield decl.name.lower(), value_str
 
 
 class _CommonExpansions(object):
