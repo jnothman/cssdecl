@@ -275,7 +275,8 @@ class _CommonExpansions(object):
 
     def _side_expander(prop_fmt):
         def expand(self, prop, value):
-            tokens = self._clean_tokens(tinycss2.parse_component_value_list(value))
+            tokens = self._clean_tokens(
+                tinycss2.parse_component_value_list(value))
             try:
                 mapping = self.SIDE_SHORTHANDS[len(tokens)]
             except KeyError:
@@ -283,7 +284,7 @@ class _CommonExpansions(object):
                               CSSWarning)
                 return
             for key, idx in zip(self.SIDES, mapping):
-                yield prop_fmt % key, tinycss2.serialize(tokens[idx:idx+1])
+                yield prop_fmt % key, tinycss2.serialize(tokens[idx:idx + 1])
 
         return expand
 
