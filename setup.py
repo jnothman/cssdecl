@@ -17,7 +17,8 @@ def setup_package():
         # See setup.cfg
         setup(py_modules=['cssdecl'],
               setup_requires=['pytest-runner'],
-              tests_require=['pytest>=2.7', 'pytest-cov~=2.4'])
+              tests_require=['pytest>=2.7', 'pytest-cov~=2.4'],
+              install_requires=['tinycss2~=0.5'])
     finally:
         del sys.path[0]
         os.chdir(old_path)
