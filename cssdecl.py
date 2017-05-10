@@ -4,14 +4,14 @@
 
 import re
 import warnings
-import functools
 from collections import defaultdict
 
-import tinycss2
-import tinycss2.color3
-
-# Unless there is no prospect for CSS3, should choose tinycss to avoid cleaning comments and parse errors at all points
-# Though whitespace gets in the way in either case
+try:
+    import tinycss2
+    import tinycss2.color3
+except ImportError:
+    # currently needed for setup.cfg to get version :(
+    pass
 
 __version__ = '0.1.3+dev'
 
