@@ -144,17 +144,22 @@ def test_css_background_shorthand(css, props):
     assert_resolves(css, props)
 
 
-@pytest.mark.xfail(reason='CSS border shorthand not yet handled')
 @pytest.mark.parametrize('style,equiv', [
-    ('border: 1px solid red',
-     'border-width: 1px; border-style: solid; border-color: red'),
-    ('border: solid red 1px',
-     'border-width: 1px; border-style: solid; border-color: red'),
-    ('border: red solid',
-     'border-style: solid; border-color: red'),
+    ('border{side}: {width} solid {color}',
+     'border{side}-width: {width}; border{side}-style: solid;' +
+     'border{side}-color: {color}'),
+    ('border{side}: solid {color} {width}',
+     'border{side}-width: {width}; border{side}-style: solid;' +
+     'border{side}-color: {color}'),
+    ('border{side}: {color} solid',
+     'border{side}-style: solid; border{side}-color: {color}'),
 ])
-def test_css_border_shorthand(style, equiv):
-    assert_same_resolution(style, equiv)
+@pytest.mark.parametrize('side', ['', '-top', '-right', '-bottom', '-left'])
+@pytest.mark.parametrize('width', ['1px', 'thin'])
+@pytest.mark.parametrize('color', ['red', 'rgb(5, 10, 20)',
+                                   'RED', 'RGB(5, 10, 20)'])
+def test_css_border_shorthand(style, equiv, side, width, color):
+    assert_same_resolution(style.format(**locals()), equiv.format(**locals()))
 
 
 @pytest.mark.parametrize('style,inherited,equiv', [
