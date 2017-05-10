@@ -3,6 +3,10 @@ import pytest
 from cssdecl import CSS22Resolver, CSSWarning
 
 
+# TODO: should add generic variants of tests, e.g. with hypothesis
+#       to test for comment intrusion, alternative whitespace, etc.
+
+
 def assert_resolves(css, props, inherited=None):
     resolver = CSS22Resolver()
     actual = resolver.resolve_string(css, inherited=inherited)
@@ -80,6 +84,19 @@ def test_css_parse_invalid(invalid_css, remainder):
     # TODO: we should be checking that in other cases no warnings are raised
 
 
+@pytest.mark.parametrize('style', [
+    'margin-left:1pt',
+    'border-top-width:1pt',
+    'border-top-style:solid',
+    'color:red',
+    'font-size:1pt',
+    # TODO: fill out
+])
+def test_normal(style):
+    # TODO: also test normal pairs
+    assert_resolves(style, dict([style.split(':', 1)]))
+
+
 @pytest.mark.parametrize(
     'shorthand,expansions',
     [('margin', ['margin-top', 'margin-right',
@@ -93,24 +110,40 @@ def test_css_parse_invalid(invalid_css, remainder):
      ('border-style', ['border-top-style', 'border-right-style',
                        'border-bottom-style', 'border-left-style']),
      ])
-def test_css_side_shorthands(shorthand, expansions):
-    top, right, bottom, left = expansions
+@pytest.mark.parametrize('inherited', [
+    None,
+    {'margin-top': '100pt', 'padding-right': '100pt',
+     'border-bottom-width': '100pt', 'border-left-color': 'green',
+     'border-top-style': 'dashed'},
+])
+def test_css_side_shorthands(shorthand, expansions, inherited):
+    top, right, bot, left = expansions
 
-    assert_resolves('%s: 1pt' % shorthand,
-                    {top: '1pt', right: '1pt',
-                     bottom: '1pt', left: '1pt'})
+    assert_same_resolution('%s: 1pt' % shorthand,
+                           '{top}: 1pt; {right}: 1pt;'
+                           '{bot}: 1pt; {left}: 1pt;'.format(**locals()),
+                           inherited)
 
-    assert_resolves('%s: 1pt 4pt' % shorthand,
-                    {top: '1pt', right: '4pt',
-                     bottom: '1pt', left: '4pt'})
+    assert_same_resolution('%s: 1pt 4pt' % shorthand,
+                           '{top}: 1pt; {right}: 4pt;'
+                           '{bot}: 1pt; {left}: 4pt;'.format(**locals()),
+                           inherited)
 
-    assert_resolves('%s: 1pt 4pt 2pt' % shorthand,
-                    {top: '1pt', right: '4pt',
-                     bottom: '2pt', left: '4pt'})
+    assert_same_resolution('%s: 1pt 4pt 2pt' % shorthand,
+                           '{top}: 1pt; {right}: 4pt;'
+                           '{bot}: 2pt; {left}: 4pt;'.format(**locals()),
+                           inherited)
 
-    assert_resolves('%s: 1pt 4pt 2pt 0pt' % shorthand,
-                    {top: '1pt', right: '4pt',
-                     bottom: '2pt', left: '0pt'})
+    assert_same_resolution('%s: thin; %s: inherit auto inherit' %
+                           (shorthand, shorthand),
+                           '{top}: inherit; {right}: auto;'
+                           '{bot}: inherit; {left}: auto;'.format(**locals()),
+                           inherited)
+
+    assert_same_resolution('%s: 1pt 4pt 2pt 0pt' % shorthand,
+                           '{top}: 1pt; {right}: 4pt;'
+                           '{bot}: 2pt; {left}: 0pt;'.format(**locals()),
+                           inherited)
 
     with pytest.warns(CSSWarning):
         assert_resolves('%s: 1pt 1pt 1pt 1pt 1pt' % shorthand,
@@ -153,13 +186,22 @@ def test_css_background_shorthand(css, props):
      'border{side}-color: {color}'),
     ('border{side}: {color} solid',
      'border{side}-style: solid; border{side}-color: {color}'),
+    ('border{side}: {width} {color} solid; border{side}: inherit',
+     'border{side}-width: inherit; border{side}-style: inherit;' +
+     'border{side}-color: inherit'),
 ])
 @pytest.mark.parametrize('side', ['', '-top', '-right', '-bottom', '-left'])
 @pytest.mark.parametrize('width', ['1px', 'thin'])
 @pytest.mark.parametrize('color', ['red', 'rgb(5, 10, 20)',
                                    'RED', 'RGB(5, 10, 20)'])
-def test_css_border_shorthand(style, equiv, side, width, color):
-    assert_same_resolution(style.format(**locals()), equiv.format(**locals()))
+@pytest.mark.parametrize('inherited', [
+    None,
+    {'border-bottom-width': '100pt', 'border-left-color': 'green',
+     'border-top-style': 'dashed'},
+])
+def test_css_border_shorthand(style, equiv, side, width, color, inherited):
+    assert_same_resolution(style.format(**locals()), equiv.format(**locals()),
+                           inherited)
 
 
 @pytest.mark.parametrize('style,inherited,equiv', [

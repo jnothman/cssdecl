@@ -24,17 +24,18 @@ class CSSWarning(UserWarning):
     pass
 
 
-def match_tokens(tokens, matchers, remainder):
-    out = defaultdict(list)
+def _clean_tokens(tokens):
+    cleaned = []
     for tok in tokens:
-        for k, matcher in matchers.items():
-            if matcher(tok):
-                out[k].append(tok)
-                break
+        if tok.type == 'comment' or tok.type == 'whitespace':
+            pass
+        elif tok.type == 'error':
+            # TODO: indicate error context (requires
+            warnings.warn('Error parsing CSS: %r' % tok.message,
+                          CSSWarning)
         else:
-            out[remainder].append(tok)
-    out.default_factory = None
-    return out
+            cleaned.append(tok)
+    return cleaned
 
 
 def match_color_token(token):
@@ -46,6 +47,38 @@ def match_size_token(token):
             or (token.type == 'ident' and token.lower_value in {
                 'medium', 'thin', 'thick', 'smaller', 'larger', 'xx-small',
                 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large'}))
+
+
+class IdentMatch:
+    def __init__(self, values):
+        assert not isinstance(values, str)
+        self.values = set(values)
+
+    def __call__(self, token):
+        return token.type == 'ident' and token.lower_value in self.values
+
+
+match_inherit_initial = IdentMatch(['inherit', 'initial'])
+
+
+def match_tokens(tokens, matchers, remainder):
+    cleaned = _clean_tokens(tokens)
+    if len(cleaned) == 1 and match_inherit_initial(cleaned[0]):
+        out = {remainder: cleaned}
+        for k in matchers:
+            out[k] = cleaned
+        return out
+
+    out = defaultdict(list)
+    for tok in cleaned:
+        for k, matcher in matchers.items():
+            if matcher(tok):
+                out[k].append(tok)
+                break
+        else:
+            out[remainder].append(tok)
+    out.default_factory = None
+    return out
 
 
 class _BaseCSSResolver(object):
@@ -239,26 +272,13 @@ class _BaseCSSResolver(object):
                 for prop, value in expand(prop, value):
                     yield prop, value
 
-    def _clean_tokens(self, tokens):
-        cleaned = []
-        for tok in tokens:
-            if tok.type == 'comment' or tok.type == 'whitespace':
-                pass
-            elif tok.type == 'error':
-                # TODO: indicate error context (requires
-                warnings.warn('Error parsing CSS: %r' % tok.message,
-                              CSSWarning)
-            else:
-                cleaned.append(tok)
-        return cleaned
-
     def _parse(self, declarations_str):
         """Generates (prop, value) pairs from declarations
 
         In a future version may generate parsed tokens from tinycss/tinycss2
         """
         decls = tinycss2.parse_declaration_list(declarations_str)
-        decls = self._clean_tokens(decls)
+        decls = _clean_tokens(decls)
         for decl in decls:
             value_str = tinycss2.serialize(decl.value).strip().lower()
             yield decl.lower_name, value_str
@@ -275,8 +295,7 @@ class _CommonExpansions(object):
 
     def _side_expander(prop_fmt):
         def expand(self, prop, value):
-            tokens = self._clean_tokens(
-                tinycss2.parse_component_value_list(value))
+            tokens = _clean_tokens(tinycss2.parse_component_value_list(value))
             try:
                 mapping = self.SIDE_SHORTHANDS[len(tokens)]
             except KeyError:
@@ -309,7 +328,7 @@ class _CommonExpansions(object):
         for side in sides:
             for k, v in matched.items():
                 if v:
-                    v = self._clean_tokens(v)
+                    v = _clean_tokens(v)
                     yield 'border-%s-%s' % (side, k), tinycss2.serialize(v)
 
     def _border_side_expander(side):
