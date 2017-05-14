@@ -32,7 +32,6 @@ def test_css_parse_normalisation(name, norm, abnorm):
     assert_same_resolution(norm, abnorm)
 
 
-@pytest.mark.xfail(reason='CSS comments not yet stripped')
 def test_css_parse_comments():
     assert_same_resolution('hello: world',
                            'hello/* foo */:/* bar \n */ world /*;not:here*/')

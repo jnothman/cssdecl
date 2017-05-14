@@ -277,7 +277,8 @@ class _BaseCSSResolver(object):
 
         In a future version may generate parsed tokens from tinycss/tinycss2
         """
-        decls = tinycss2.parse_declaration_list(declarations_str)
+        decls = tinycss2.parse_declaration_list(declarations_str,
+                                                skip_comments=True)
         decls = _clean_tokens(decls)
         for decl in decls:
             value_str = tinycss2.serialize(decl.value).strip().lower()
