@@ -41,12 +41,10 @@ def test_css_parse_specificity():
     assert_same_resolution('font-weight: bold', 'font-weight: bold !important')
 
 
-@pytest.mark.xfail(reason='Splitting CSS declarations not yet sensitive to '
-                          '; in CSS strings')
 def test_css_parse_strings():
     # semicolons in strings
     assert_resolves('background-image: url(\'http://blah.com/foo?a;b=c\')',
-                    {'background-image': 'url(\'http://blah.com/foo?a;b=c\')'})
+                    {'background-image': 'url("http://blah.com/foo?a;b=c")'})
     assert_resolves('background-image: url("http://blah.com/foo?a;b=c")',
                     {'background-image': 'url("http://blah.com/foo?a;b=c")'})
 
