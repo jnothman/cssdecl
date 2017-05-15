@@ -4,6 +4,14 @@
 
 import re
 import warnings
+from collections import defaultdict
+
+try:
+    import tinycss2
+    import tinycss2.color3
+except ImportError:
+    # currently needed for setup.cfg to get version :(
+    pass
 
 __version__ = '0.1.3+dev'
 
@@ -14,6 +22,63 @@ __all__ = ['CSSWarning', 'CSS22Resolver']
 class CSSWarning(UserWarning):
     """Warning for when this CSS syntax cannot currently be parsed"""
     pass
+
+
+def _clean_tokens(tokens):
+    cleaned = []
+    for tok in tokens:
+        if tok.type == 'comment' or tok.type == 'whitespace':
+            pass
+        elif tok.type == 'error':
+            # TODO: indicate error context (requires
+            warnings.warn('Error parsing CSS: %r' % tok.message,
+                          CSSWarning)
+        else:
+            cleaned.append(tok)
+    return cleaned
+
+
+def match_color_token(token):
+    return tinycss2.color3.parse_color(token) is not None
+
+
+def match_size_token(token):
+    return (token.type == 'dimension' or token.type == 'percentage'
+            or (token.type == 'ident' and token.lower_value in {
+                'medium', 'thin', 'thick', 'smaller', 'larger', 'xx-small',
+                'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large'}))
+
+
+class IdentMatch:
+    def __init__(self, values):
+        assert not isinstance(values, str)
+        self.values = set(values)
+
+    def __call__(self, token):
+        return token.type == 'ident' and token.lower_value in self.values
+
+
+match_inherit_initial = IdentMatch(['inherit', 'initial'])
+
+
+def match_tokens(tokens, matchers, remainder):
+    cleaned = _clean_tokens(tokens)
+    if len(cleaned) == 1 and match_inherit_initial(cleaned[0]):
+        out = {remainder: cleaned}
+        for k in matchers:
+            out[k] = cleaned
+        return out
+
+    out = defaultdict(list)
+    for tok in cleaned:
+        for k, matcher in matchers.items():
+            if matcher(tok):
+                out[k].append(tok)
+                break
+        else:
+            out[remainder].append(tok)
+    out.default_factory = None
+    return out
 
 
 class _BaseCSSResolver(object):
@@ -212,18 +277,12 @@ class _BaseCSSResolver(object):
 
         In a future version may generate parsed tokens from tinycss/tinycss2
         """
-        for decl in declarations_str.split(';'):
-            if not decl.strip():
-                continue
-            prop, sep, val = decl.partition(':')
-            prop = prop.strip().lower()
-            # TODO: don't lowercase case sensitive parts of values (strings)
-            val = val.strip().lower()
-            if sep:
-                yield prop, val
-            else:
-                warnings.warn('Ill-formatted attribute: expected a colon '
-                              'in %r' % decl, CSSWarning)
+        decls = tinycss2.parse_declaration_list(declarations_str,
+                                                skip_comments=True)
+        decls = _clean_tokens(decls)
+        for decl in decls:
+            value_str = tinycss2.serialize(decl.value).strip().lower()
+            yield decl.lower_name, value_str
 
 
 class _CommonExpansions(object):
@@ -237,7 +296,7 @@ class _CommonExpansions(object):
 
     def _side_expander(prop_fmt):
         def expand(self, prop, value):
-            tokens = value.split()
+            tokens = _clean_tokens(tinycss2.parse_component_value_list(value))
             try:
                 mapping = self.SIDE_SHORTHANDS[len(tokens)]
             except KeyError:
@@ -245,7 +304,7 @@ class _CommonExpansions(object):
                               CSSWarning)
                 return
             for key, idx in zip(self.SIDES, mapping):
-                yield prop_fmt % key, tokens[idx]
+                yield prop_fmt % key, tinycss2.serialize(tokens[idx:idx + 1])
 
         return expand
 
@@ -254,6 +313,35 @@ class _CommonExpansions(object):
     expand_border_width = _side_expander('border-%s-width')
     expand_margin = _side_expander('margin-%s')
     expand_padding = _side_expander('padding-%s')
+
+    def expand_border(self, prop, value, side=None):
+        if side is None:
+            sides = ['top', 'right', 'bottom', 'left']
+        else:
+            sides = [side]
+
+        # TODO: clean tokens?
+        value = tinycss2.parse_component_value_list(value)
+        matched = match_tokens(value,
+                               {'width': match_size_token,
+                                'color': match_color_token},
+                               remainder='style')
+        for side in sides:
+            for k, v in matched.items():
+                if v:
+                    v = _clean_tokens(v)
+                    yield 'border-%s-%s' % (side, k), tinycss2.serialize(v)
+
+    def _border_side_expander(side):
+        # XXX: functools.partial cannot be bound!
+        def expand_border_side(self, prop, value):
+            return self.expand_border(prop, value, side)
+        return expand_border_side
+
+    expand_border_top = _border_side_expander('top')
+    expand_border_right = _border_side_expander('right')
+    expand_border_bottom = _border_side_expander('bottom')
+    expand_border_left = _border_side_expander('left')
 
 
 class CSS22Resolver(_BaseCSSResolver, _CommonExpansions):
