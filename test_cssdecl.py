@@ -57,6 +57,7 @@ def test_css_parse_strings():
         ('border-style: solid; hello-world; font-weight: bold',
          'border-style: solid; font-weight: bold'),
         # Unclosed string
+        # xfail because of https://github.com/SimonSapin/tinycss2/issues/5
         pytest.mark.xfail(('background-image: "abc', ''),
                           reason='Unclosed CSS strings not detected'),
         pytest.mark.xfail(('font-family: "abc', ''),
